@@ -18,3 +18,8 @@ void Tile::render(sf::RenderWindow* t_window)
 {
 	t_window->draw(m_tile);
 }
+
+void Tile::setColour(sf::Color t_color)
+{
+	m_tile.setFillColor(t_color);
+}

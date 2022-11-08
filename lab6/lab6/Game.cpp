@@ -8,15 +8,7 @@ Game::Game() :
 	m_window{ sf::VideoMode{ 1600U, 1600U, 32U }, "SFML Game" },
 	m_exitGame{false} //when true game will exit
 {
-
-	for (int i = 0; i < 50; i++)
-	{
-		for (int j = 0; j < 50; j++)
-		{
-			m_tiles.at(i).at(j) = new Tile();
-			m_tiles.at(i).at(j)->setPosition(m_tiles.at(i).at(j)->m_width * i, m_tiles.at(i).at(j)->m_width * j);
-		}
-	}
+	m_grid = new Grid();
 }
 
 Game::~Game()
@@ -73,17 +65,12 @@ void Game::update(sf::Time t_deltaTime)
 	{
 		m_window.close();
 	}
+	m_grid->update(t_deltaTime, m_window);
 }
 
 void Game::render()
 {
 	m_window.clear(sf::Color::White);
-	for (int i = 0; i < 50; i++)
-	{
-		for (int j = 0; j < 50; j++)
-		{
-			m_tiles.at(i).at(j)->render(&m_window);
-		}
-	}
+	m_grid->render(&m_window);
 	m_window.display();
 }

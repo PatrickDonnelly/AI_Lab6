@@ -15,6 +15,8 @@ class Tile
 		float m_width = 32.0f;
 		void setPosition(float m_x, float m_y);
 		void render(sf::RenderWindow* t_window);
+		void setColour(sf::Color t_color);
+		sf::RectangleShape getTile() { return m_tile; }
 
 };
 #endif // !TILE_HPP

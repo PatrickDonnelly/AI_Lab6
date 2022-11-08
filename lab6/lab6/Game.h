@@ -10,6 +10,7 @@
 #include <SFML/Graphics.hpp>
 #include <array>
 #include "Tile.h"
+#include "Grid.h"
 
 class Game
 {
@@ -17,9 +18,10 @@ public:
 	Game();
 	~Game();
 	void run();
-	std::array<std::array<Tile*, 50>, 50> m_tiles{nullptr}; // 2D Array of tile pointers 50 x 50
 
 private:
+
+	Grid* m_grid{ nullptr };
 
 	void processEvents();
 	void processKeys(sf::Event t_event);
