@@ -18,6 +18,7 @@ private:
 
 public:
 
+	float integrationField(int& t_row, int& t_col);
 	void resetGrid();
 	std::queue<Tile*> m_tileQueue{};
 	sf::Font m_textFont;

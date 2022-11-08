@@ -19,18 +19,6 @@ Grid::Grid()
 	m_tileQueue.push(m_goalTile);
 }
 
-void Grid::resetGrid()
-{
-	for (int i = 0; i < 50; i++)
-	{
-		for (int j = 0; j < 50; j++)
-		{
-			m_tiles.at(i).at(j)->m_cost = 0;
-			m_tiles.at(i).at(j)->m_text.setString(" ");
-		}
-	}
-}
-
 void Grid::setUpFont()
 {
 	if (!m_textFont.loadFromFile("ASSETS\\FONTS\\ariblk.ttf"))
@@ -63,7 +51,7 @@ void Grid::render(sf::RenderWindow* t_window)
 		for (int j = 0; j < 50; j++)
 		{
 			m_tiles.at(i).at(j)->m_text.setPosition(m_tiles.at(i).at(j)->m_width*i, m_tiles.at(i).at(j)->m_width*j);
-			m_tiles.at(i).at(j)->m_text.setString(std::to_string(m_tiles.at(i).at(j)->m_cost));
+			m_tiles.at(i).at(j)->m_text.setString(std::to_string(m_tiles.at(i).at(j)->m_integrationCost));
 			m_tiles.at(i).at(j)->render(t_window);
 		}
 	}
@@ -90,7 +78,32 @@ void Grid::costField()
 			}
 			int cost = m_tiles.at(m_tileQueue.front()->rowColumn.x).at(m_tileQueue.front()->rowColumn.y)->m_cost + 1;
 			m_tiles.at(l_row).at(l_col)->m_cost = cost;
+
+			// integration cost added
+			float distance = integrationField(l_row, l_col);
+			m_tiles.at(l_row).at(l_col)->m_integrationCost = static_cast<float>(cost) + distance;
+			
 			m_tileQueue.push(m_tiles.at(l_row).at(l_col));
+		}
+	}
+}
+
+float Grid::integrationField(int& t_row, int& t_col)
+{
+	sf::Vector2f distance{ static_cast<float>(m_goalTile->rowColumn.x - t_row), static_cast<float>(m_goalTile->rowColumn.y - t_col) };
+	float magnitude = sqrt((distance.x * distance.x) + (distance.y * distance.y));
+	return magnitude;
+}
+
+void Grid::resetGrid()
+{
+	for (int i = 0; i < 50; i++)
+	{
+		for (int j = 0; j < 50; j++)
+		{
+			m_tiles.at(i).at(j)->m_cost = 0;
+			m_tiles.at(i).at(j)->m_integrationCost = 0.0f;
+			m_tiles.at(i).at(j)->m_text.setString(" ");
 		}
 	}
 }

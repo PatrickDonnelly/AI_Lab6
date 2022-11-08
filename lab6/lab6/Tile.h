@@ -14,6 +14,7 @@ class Tile
 
 		sf::Text m_text;
 		sf::Vector2i rowColumn{};
+		float m_integrationCost;
 		void setUpText(sf::Font& t_font);
 
 		int m_cost;
