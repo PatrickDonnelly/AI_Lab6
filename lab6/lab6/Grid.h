@@ -18,6 +18,7 @@ private:
 
 public:
 
+	void resetGrid();
 	std::queue<Tile*> m_tileQueue{};
 	sf::Font m_textFont;
 	void setUpFont();
