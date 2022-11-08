@@ -4,6 +4,8 @@
 #include <SFML/Graphics.hpp>
 #include "Tile.h"
 #include <array>
+#include <queue>
+#include <iostream>
 
 class Grid
 {
@@ -16,10 +18,16 @@ private:
 
 public:
 
+	std::queue<Tile*> m_tileQueue{};
+	sf::Font m_textFont;
+	void setUpFont();
+
 	Grid();
 	void render(sf::RenderWindow* t_window);
 	void update(sf::Time t_deltaTime, sf::RenderWindow& m_window);
 	std::array<std::array<Tile*, 50>, 50> m_tiles{ nullptr }; // 2D Array of tile pointers 50 x 50
+
+	void costField();
 
 };
 #endif // !GRID_HPP

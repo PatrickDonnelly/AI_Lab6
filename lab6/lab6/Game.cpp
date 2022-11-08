@@ -5,7 +5,7 @@
 #include <iostream>
 
 Game::Game() :
-	m_window{ sf::VideoMode{ 1600U, 1600U, 32U }, "SFML Game" },
+	m_window{ sf::VideoMode{ 1250U, 1250U, 32U }, "SFML Game" },
 	m_exitGame{false} //when true game will exit
 {
 	m_grid = new Grid();

@@ -11,8 +11,14 @@ class Tile
 
 	public:
 
-		Tile();
-		float m_width = 32.0f;
+
+		sf::Text m_text;
+		sf::Vector2i rowColumn{};
+		void setUpText(sf::Font& t_font);
+
+		int m_cost;
+		Tile(sf::Font& t_font);
+		float m_width = 25.0f;
 		void setPosition(float m_x, float m_y);
 		void render(sf::RenderWindow* t_window);
 		void setColour(sf::Color t_color);
