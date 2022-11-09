@@ -17,7 +17,7 @@ private:
 	Tile* m_goalTile{ nullptr };
 
 public:
-
+	int m_testCount = 0;
 	float integrationField(int& t_row, int& t_col);
 	void resetGrid();
 	std::queue<Tile*> m_tileQueue{};

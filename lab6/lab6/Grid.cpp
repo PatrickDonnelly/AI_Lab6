@@ -10,12 +10,17 @@ Grid::Grid()
 			m_tiles.at(i).at(j) = new Tile(m_textFont);
 			m_tiles.at(i).at(j)->setPosition(m_tiles.at(i).at(j)->m_width * i, m_tiles.at(i).at(j)->m_width * j);
 			m_tiles.at(i).at(j)->rowColumn = sf::Vector2i{ i,j };
+			m_tiles.at(i).at(j)->m_checked = false;
+			m_tiles.at(i).at(j)->m_cost = 0;
+			m_tiles.at(i).at(j)->m_integrationCost = 0;
+
 		}
 	}
 	m_startingTile = m_tiles.at(5).at(5);
 	m_tiles.at(5).at(5)->setColour(sf::Color::Blue);
 	m_goalTile = m_tiles.at(30).at(30);
 	m_tiles.at(30).at(30)->setColour(sf::Color::Red);
+	m_goalTile->m_checked = true;
 	m_tileQueue.push(m_goalTile);
 }
 
@@ -62,6 +67,7 @@ void Grid::costField()
 	for (int direction = 0; direction < 9; direction++)
 	{
 		m_goalTile->m_cost = 0;
+		m_goalTile->m_checked = true;
 		if (direction == 4)
 		{
 			continue; // stops starting point being assigned a cost
@@ -70,8 +76,10 @@ void Grid::costField()
 		int l_row = m_tileQueue.front()->rowColumn.x + ((direction / 3) - 1);
 		int l_col = m_tileQueue.front()->rowColumn.y + ((direction % 3) - 1);
 
-		if (l_row >= 0 && l_row < 50 && l_col >= 0 && l_col < 50)
+		if (l_row >= 0 && l_row < 50 && l_col >= 0 && l_col < 50 && m_tiles.at(l_row).at(l_col)->m_checked == false)
 		{
+			m_testCount++;
+			std::cout << m_testCount << std::endl;
 			if (m_tiles.at(l_row).at(l_col)->m_cost !=0)
 			{
 				continue; // stops endless loop
@@ -82,8 +90,9 @@ void Grid::costField()
 			// integration cost added
 			float distance = integrationField(l_row, l_col);
 			m_tiles.at(l_row).at(l_col)->m_integrationCost = static_cast<float>(cost) + distance;
-			
+			m_tiles.at(l_row).at(l_col)->m_checked = true;
 			m_tileQueue.push(m_tiles.at(l_row).at(l_col));
+
 		}
 	}
 }
@@ -104,6 +113,9 @@ void Grid::resetGrid()
 			m_tiles.at(i).at(j)->m_cost = 0;
 			m_tiles.at(i).at(j)->m_integrationCost = 0.0f;
 			m_tiles.at(i).at(j)->m_text.setString(" ");
+			m_tiles.at(i).at(j)->m_checked = false;
+			m_tiles.at(i).at(j)->m_cost = 0;
+			m_tiles.at(i).at(j)->m_integrationCost = 0;
 		}
 	}
 }

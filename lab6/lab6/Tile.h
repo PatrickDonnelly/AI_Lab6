@@ -11,7 +11,7 @@ class Tile
 
 	public:
 
-
+		bool m_checked;
 		sf::Text m_text;
 		sf::Vector2i rowColumn{};
 		float m_integrationCost;

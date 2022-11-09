@@ -13,6 +13,7 @@ void Tile::setUpText(sf::Font& t_font)
 Tile::Tile(sf::Font& t_font)
 {
 	setUpText(t_font);
+	m_checked = false;
 	m_cost = 0;
 	m_integrationCost = 0.0f;
 	m_tile.setSize(sf::Vector2f(m_width, m_width));
