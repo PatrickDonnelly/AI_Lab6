@@ -24,15 +24,16 @@ class Tile
 
 		float m_integrationCost;
 		void setUpText(sf::Font& t_font);
-
+		int alpha;
 		sf::Vector2i pathPos{};
 		int m_cost;
 		Tile(sf::Font& t_font);
-		float m_width = 25.0f;
+		float m_width = 20.0f;
 		void setPosition(float m_x, float m_y);
 		void render(sf::RenderWindow* t_window);
 		void setColour(sf::Color t_color);
+		void setColourIntensity();
 		sf::RectangleShape getTile() { return m_tile; }
-		bool showCost, showVectorField = false;
+		bool showCost = false, showVectorField = false;
 };
 #endif // !TILE_HPP

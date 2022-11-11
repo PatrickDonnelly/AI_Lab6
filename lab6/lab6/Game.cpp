@@ -5,7 +5,7 @@
 #include <iostream>
 
 Game::Game() :
-	m_window{ sf::VideoMode{ 1250U, 1250U, 32U }, "SFML Game" },
+	m_window{ sf::VideoMode{ 1250U, 1000U, 32U }, "Flow Field Pathfinding" },
 	m_exitGame{false} //when true game will exit
 {
 	m_grid = new Grid();
@@ -104,7 +104,7 @@ void Game::update(sf::Time t_deltaTime)
 
 void Game::render()
 {
-	m_window.clear(sf::Color::White);
+	m_window.clear(sf::Color::Red);
 	m_grid->render(&m_window);
 	m_window.display();
 }
