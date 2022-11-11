@@ -57,46 +57,61 @@ void Grid::createPath()
 	{
 		pathTile->setColour(sf::Color(0,255,0,125));
 		pathTile = m_tiles.at(pathTile->pathPos.x).at(pathTile->pathPos.y);
+		if (m_timer.getElapsedTime().asSeconds() > 2.0f)
+		{
+			break;
+		}
 	}
 }
 
 void Grid::update(sf::Time t_deltaTime, sf::RenderWindow& m_window)
 {
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+	for (int i{}; i < 50; ++i)
 	{
-		newStart = true;
-		setStartTile(m_window);
-	}
-	else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
-	{
-		newGoal = true;
-		setGoalTile(m_window);
-	}
-	while (!m_tileQueue.empty())
-	{
-		costField();
-
-		m_tileQueue.pop();
-	}
-	if (newGoal == true)
-	{
-		for (int i = 0; i < 50; i++)
+		for (int j{}; j < 50; ++j)
 		{
-			for (int j = 0; j < 50; j++)
+			if (m_tiles.at(i).at(j)->getTile().getGlobalBounds().contains(m_window.mapPixelToCoords(sf::Mouse::getPosition(m_window))))
 			{
-				vectorField(i, j);
-			}
-		}
-		newGoal = false;
-		createPath();
-	}
-	if(newStart)
-	{
-		setStartTile(m_window);
-		newStart = false;
-		createPath();
-	}
+				if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+				{
+					if (m_tiles.at(i).at(j) != m_goalTile && m_tiles.at(i).at(j) != m_startingTile)
+					{
+						m_tiles.at(i).at(j)->setColour(sf::Color::Cyan);
+						regenerateGrid(m_window);
+						createPath();
+					}
+					break;
 
+				}
+				else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right) && sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+				{
+					if (m_tiles.at(i).at(j) != m_goalTile && m_tiles.at(i).at(j) != m_startingTile)
+					{
+						m_tiles.at(i).at(j)->setColour(sf::Color::Black);
+						regenerateGrid(m_window);
+						createPath();
+					}
+					break;
+
+				}
+				else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+				{
+					newStart = true;
+					setStartTile(m_window);
+					regenerateGrid(m_window);
+					break;
+				}
+				else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
+				{
+					newGoal = true;
+					setGoalTile(m_window);
+					regenerateGrid(m_window);
+					break;
+				}
+			}
+
+		}
+	}
 }
 
 void Grid::render(sf::RenderWindow* t_window)
@@ -114,7 +129,9 @@ void Grid::render(sf::RenderWindow* t_window)
 		{
 			m_tiles.at(i).at(j)->m_text.setPosition(m_tiles.at(i).at(j)->m_width*i, m_tiles.at(i).at(j)->m_width*j);
 			m_tiles.at(i).at(j)->m_text.setString(std::to_string(m_tiles.at(i).at(j)->m_integrationCost));
-			m_tiles.at(i).at(j)->drawLines(t_window);
+
+				m_tiles.at(i).at(j)->drawLines(t_window);
+			
 		}
 	}
 }
@@ -137,7 +154,7 @@ void Grid::costField()
 		{
 			//m_testCount++;
 			//std::cout << m_testCount << std::endl;
-			if (m_tiles.at(l_row).at(l_col)->m_cost !=0)
+			if (m_tiles.at(l_row).at(l_col)->m_cost !=0 && m_tiles.at(l_row).at(l_col)->getTile().getFillColor() == sf::Color::Cyan)
 			{
 				continue; // stops endless loop
 			}
@@ -151,6 +168,61 @@ void Grid::costField()
 			m_tileQueue.push(m_tiles.at(l_row).at(l_col));
 
 		}
+	}
+}
+
+void Grid::regenerateGrid(sf::RenderWindow& t_window)
+{
+
+	for (int i = 0; i < 50; i++)
+	{
+		for (int j = 0; j < 50; j++)
+		{
+				if (m_tiles.at(i).at(j)->getTile().getFillColor() != sf::Color::Cyan)
+				{
+					if (m_tiles.at(i).at(j) != m_goalTile && m_tiles.at(i).at(j) != m_startingTile)
+					{
+						m_tiles.at(i).at(j)->setColour(sf::Color::Black);
+					}
+					m_tiles.at(i).at(j)->m_cost = 0;
+					m_tiles.at(i).at(j)->m_integrationCost = 0;
+					m_tiles.at(i).at(j)->m_checked = false;
+				}
+				else
+				{
+					m_tiles.at(i).at(j)->m_checked = true;
+					m_tiles.at(i).at(j)->m_vector = sf::Vector2f{};
+					m_tiles.at(i).at(j)->m_cost = 9999;
+					m_tiles.at(i).at(j)->m_integrationCost = 9999;
+				}
+		}
+	}
+
+	m_tileQueue.push(m_goalTile);
+
+	while (!m_tileQueue.empty())
+	{
+		costField();
+		m_tileQueue.pop();
+	}
+
+	for (int i = 0; i < 50; i++)
+	{
+		for (int j = 0; j < 50; j++)
+		{
+			vectorField(i, j);
+		}
+	}
+
+	if (newGoal == true)
+	{
+		newGoal = false;
+		createPath();
+	}
+	if (newStart)
+	{
+		newStart = false;
+		createPath();
 	}
 }
 
@@ -177,15 +249,15 @@ void Grid::vectorField(int& t_row, int& t_col)
 		int l_row = t_row + ((direction / 3) - 1);
 		int l_col = t_col + ((direction % 3) - 1);
 
-		if (l_row >= 0 && l_row < 50 && l_col >= 0 && l_col < 50)
+		if (l_row >= 0 && l_row < 50 && l_col >= 0 && l_col < 50 && m_tiles.at(l_row).at(l_col)->getTile().getFillColor() != sf::Color::Cyan)
 		{
 			//std::cout << l_row << std::endl;
-			if (bestPath == -1 || m_tiles.at(l_row).at(l_col)->m_integrationCost < bestPathCost)
+			if (bestPath == -1 || m_tiles.at(l_row).at(l_col)->m_integrationCost <= bestPathCost)
 			{
 				bestPath = direction;
 				bestPathCost = m_tiles.at(l_row).at(l_col)->m_integrationCost;
 				m_tiles.at(t_row).at(t_col)->pathPos = sf::Vector2i{ l_row,l_col };
-				m_tiles.at(t_row).at(t_col)->m_vector = sf::Vector2f{ t_row + (bestPath / 3) - 1.0f,t_col + (bestPath % 3) - 1.0f};
+				m_tiles.at(t_row).at(t_col)->m_vector = sf::Vector2f{ t_row + (bestPath / 3) - 1.0f,t_col + (bestPath % 3) - 1.0f };
 			}
 		}
 	}
@@ -197,7 +269,7 @@ void Grid::resetGrid()
 	{
 		for (int j = 0; j < 50; j++)
 		{
-			if (m_tiles.at(i).at(j) != m_startingTile)
+			if (m_tiles.at(i).at(j) != m_startingTile && m_tiles.at(i).at(j)->getTile().getFillColor() != sf::Color::Cyan)
 			{
 				m_tiles.at(i).at(j)->setColour(sf::Color::Black);
 			}
@@ -216,7 +288,7 @@ void Grid::setStartTile(sf::RenderWindow& t_window)
 	{
 		for (int j = 0; j < 50; j++)
 		{
-			if (m_tiles.at(i).at(j) != m_goalTile)
+			if (m_tiles.at(i).at(j) != m_goalTile && m_tiles.at(i).at(j)->getTile().getFillColor() != sf::Color::Cyan)
 			{
 				m_tiles.at(i).at(j)->setColour(sf::Color::Black);
 				if (m_tiles.at(i).at(j)->getTile().getGlobalBounds().contains(t_window.mapPixelToCoords(sf::Mouse::getPosition(t_window))))
@@ -242,7 +314,7 @@ void Grid::setGoalTile(sf::RenderWindow& t_window)
 		{
 			if (m_tiles.at(i).at(j)->getTile().getGlobalBounds().contains(t_window.mapPixelToCoords(sf::Mouse::getPosition(t_window))))
 			{
-				if (m_tiles.at(i).at(j) != m_startingTile)
+				if (m_tiles.at(i).at(j) != m_startingTile && m_tiles.at(i).at(j)->getTile().getFillColor() != sf::Color::Cyan)
 				{
 					m_goalTile->setColour(sf::Color::Black);
 					m_tiles.at(i).at(j)->setColour(sf::Color::Red);

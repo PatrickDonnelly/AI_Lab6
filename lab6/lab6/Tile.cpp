@@ -43,11 +43,17 @@ void Tile::drawLines(sf::RenderWindow* t_window)
 {
 	t_window->draw(m_tile);
 	// multiply by cell width
-	sf::Vector2f bestPathPosition = sf::Vector2f(static_cast<float>(m_vector.x) * 25, static_cast<float>(m_vector.y) * 25);
-	lines.append(sf::Vertex{ m_tile.getPosition() + sf::Vector2f{25, 25} / 2.0f, sf::Color::Magenta});
-	lines.append(sf::Vertex{ bestPathPosition + sf::Vector2f{ 25, 25 } / 2.0f, sf::Color(sf::Color(0,0,0,0))});
-	t_window->draw(lines);
-	t_window->draw(m_text);
+	if (m_integrationCost > 0 && m_integrationCost < 999 && showVectorField)
+	{
+		sf::Vector2f bestPathPosition = sf::Vector2f(static_cast<float>(m_vector.x) * 25, static_cast<float>(m_vector.y) * 25);
+		lines.append(sf::Vertex{ m_tile.getPosition() + sf::Vector2f{25, 25} / 2.0f, sf::Color::Magenta });
+		lines.append(sf::Vertex{ bestPathPosition + sf::Vector2f{ 25, 25 } / 2.0f, sf::Color(sf::Color(0,0,0,0)) });
+		t_window->draw(lines);
+	}
+	if (showCost)
+	{
+		t_window->draw(m_text);
+	}
 }
 
 void Tile::setColour(sf::Color t_color)

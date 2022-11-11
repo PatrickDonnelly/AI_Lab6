@@ -26,6 +26,7 @@ public:
 	sf::Font m_textFont;
 	void setUpFont();
 	void createPath();
+	void regenerateGrid(sf::RenderWindow& t_window);
 	bool newStart = false;
 
 	Grid();
@@ -34,7 +35,7 @@ public:
 	std::array<std::array<Tile*, 50>, 50> m_tiles{ nullptr }; // 2D Array of tile pointers 50 x 50
 
 	void costField();
-
+	bool noPath = false;
 };
 #endif // !GRID_HPP
 

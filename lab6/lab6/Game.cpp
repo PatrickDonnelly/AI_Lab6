@@ -57,6 +57,40 @@ void Game::processKeys(sf::Event t_event)
 	{
 		m_exitGame = true;
 	}
+	if (sf::Keyboard::C == t_event.key.code)
+	{
+		for (int i{}; i < 50; ++i)
+		{
+			for (int j{}; j < 50; ++j)
+			{
+				if (m_grid->m_tiles.at(i).at(j)->showCost)
+				{
+					m_grid->m_tiles.at(i).at(j)->showCost = false;
+				}
+				else 
+				{
+					m_grid->m_tiles.at(i).at(j)->showCost = true;
+				}
+			}
+		}
+	}
+	if (sf::Keyboard::V == t_event.key.code)
+	{
+		for (int i{}; i < 50; ++i)
+		{
+			for (int j{}; j < 50; ++j)
+			{
+				if (m_grid->m_tiles.at(i).at(j)->showVectorField)
+				{
+					m_grid->m_tiles.at(i).at(j)->showVectorField = false;
+				}
+				else
+				{
+					m_grid->m_tiles.at(i).at(j)->showVectorField = true;
+				}
+			}
+		}
+	}
 }
 
 void Game::update(sf::Time t_deltaTime)

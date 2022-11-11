@@ -33,6 +33,6 @@ class Tile
 		void render(sf::RenderWindow* t_window);
 		void setColour(sf::Color t_color);
 		sf::RectangleShape getTile() { return m_tile; }
-
+		bool showCost, showVectorField = false;
 };
 #endif // !TILE_HPP
