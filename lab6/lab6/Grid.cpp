@@ -18,10 +18,24 @@ Grid::Grid()
 	}
 	m_startingTile = m_tiles.at(5).at(5);
 	m_tiles.at(5).at(5)->setColour(sf::Color::Blue);
-	m_goalTile = m_tiles.at(30).at(30);
-	m_tiles.at(30).at(30)->setColour(sf::Color::Red);
+	m_goalTile = m_tiles.at(49).at(49);
+	m_tiles.at(49).at(49)->setColour(sf::Color::Red);
 	m_goalTile->m_checked = true;
 	m_tileQueue.push(m_goalTile);
+	
+	while (!m_tileQueue.empty())
+	{
+		costField();
+
+		m_tileQueue.pop();
+	}
+	for (int row = 0; row < 50; row++)
+	{
+		for (int col = 0; col < 50; col++)
+		{
+			vectorField(row, col);
+		}
+	}
 }
 
 void Grid::setUpFont()
@@ -40,13 +54,27 @@ void Grid::update(sf::Time t_deltaTime, sf::RenderWindow& m_window)
 	}
 	else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
 	{
+		newGoal = true;
 		setGoalTile(m_window);
 	}
 	while (!m_tileQueue.empty())
 	{
 		costField();
+
 		m_tileQueue.pop();
 	}
+	if (newGoal == true)
+	{
+		for (int i = 0; i < 50; i++)
+		{
+			for (int j = 0; j < 50; j++)
+			{
+				vectorField(i, j);
+			}
+		}
+		newGoal = false;
+	}
+
 }
 
 void Grid::render(sf::RenderWindow* t_window)
@@ -55,9 +83,16 @@ void Grid::render(sf::RenderWindow* t_window)
 	{
 		for (int j = 0; j < 50; j++)
 		{
+			m_tiles.at(i).at(j)->clearLines();
+		}
+	}
+	for (int i = 0; i < 50; i++)
+	{
+		for (int j = 0; j < 50; j++)
+		{
 			m_tiles.at(i).at(j)->m_text.setPosition(m_tiles.at(i).at(j)->m_width*i, m_tiles.at(i).at(j)->m_width*j);
 			m_tiles.at(i).at(j)->m_text.setString(std::to_string(m_tiles.at(i).at(j)->m_integrationCost));
-			m_tiles.at(i).at(j)->render(t_window);
+			m_tiles.at(i).at(j)->drawLines(t_window);
 		}
 	}
 }
@@ -73,13 +108,13 @@ void Grid::costField()
 			continue; // stops starting point being assigned a cost
 		}
 		
-		int l_row = m_tileQueue.front()->rowColumn.x + ((direction / 3) - 1);
-		int l_col = m_tileQueue.front()->rowColumn.y + ((direction % 3) - 1);
+		int l_row = m_tileQueue.front()->rowColumn.x + (direction / 3) - 1;
+		int l_col = m_tileQueue.front()->rowColumn.y + (direction % 3) - 1;
 
 		if (l_row >= 0 && l_row < 50 && l_col >= 0 && l_col < 50 && m_tiles.at(l_row).at(l_col)->m_checked == false)
 		{
-			m_testCount++;
-			std::cout << m_testCount << std::endl;
+			//m_testCount++;
+			//std::cout << m_testCount << std::endl;
 			if (m_tiles.at(l_row).at(l_col)->m_cost !=0)
 			{
 				continue; // stops endless loop
@@ -104,18 +139,49 @@ float Grid::integrationField(int& t_row, int& t_col)
 	return magnitude;
 }
 
+void Grid::vectorField(int& t_row, int& t_col)
+{
+
+	int bestPath = -1;
+	float bestPathCost = 0.0f;
+
+	for (int direction = 0; direction < 9; direction++)
+	{
+		if (direction == 4)
+		{
+			continue;
+		}
+
+		int l_row = t_row + ((direction / 3) - 1);
+		int l_col = t_col + ((direction % 3) - 1);
+
+		if (l_row >= 0 && l_row < 50 && l_col >= 0 && l_col < 50)
+		{
+			//std::cout << l_row << std::endl;
+			if (bestPath == -1 || m_tiles.at(l_row).at(l_col)->m_integrationCost < bestPathCost)
+			{
+				bestPath = direction;
+				bestPathCost = m_tiles.at(l_row).at(l_col)->m_integrationCost;
+				m_tiles.at(t_row).at(t_col)->m_vector = sf::Vector2f{ t_row + (bestPath / 3) - 1.0f,t_col + (bestPath % 3) - 1.0f};
+			}
+		}
+	}
+}
+
 void Grid::resetGrid()
 {
 	for (int i = 0; i < 50; i++)
 	{
 		for (int j = 0; j < 50; j++)
 		{
-			m_tiles.at(i).at(j)->m_cost = 0;
-			m_tiles.at(i).at(j)->m_integrationCost = 0.0f;
-			m_tiles.at(i).at(j)->m_text.setString(" ");
-			m_tiles.at(i).at(j)->m_checked = false;
-			m_tiles.at(i).at(j)->m_cost = 0;
-			m_tiles.at(i).at(j)->m_integrationCost = 0;
+			if (m_tiles.at(i).at(j) != m_startingTile)
+			{
+				m_tiles.at(i).at(j)->clearLines();
+				m_tiles.at(i).at(j)->m_vector = sf::Vector2f{};
+				m_tiles.at(i).at(j)->m_checked = false;
+				m_tiles.at(i).at(j)->m_cost = 0;
+				m_tiles.at(i).at(j)->m_integrationCost = 0;
+			}
 		}
 	}
 }
@@ -133,7 +199,7 @@ void Grid::setStartTile(sf::RenderWindow& t_window)
 					m_startingTile->setColour(sf::Color::Black);
 					m_tiles.at(i).at(j)->setColour(sf::Color::Blue);
 					m_startingTile = m_tiles.at(i).at(j);
-					m_tileQueue.push(m_goalTile);
+					//m_tileQueue.push(m_goalTile);
 				}
 			}
 		}
@@ -156,6 +222,7 @@ void Grid::setGoalTile(sf::RenderWindow& t_window)
 					m_goalTile->setColour(sf::Color::Black);
 					m_tiles.at(i).at(j)->setColour(sf::Color::Red);
 					m_goalTile = m_tiles.at(i).at(j);
+					m_goalTile->m_checked = true;
 					m_tileQueue.push(m_goalTile);
 				}
 			}

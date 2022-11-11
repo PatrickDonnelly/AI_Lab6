@@ -2,6 +2,8 @@
 #define TILE_HPP
 
 #include <SFML/Graphics.hpp>
+#include "math.h"
+#include <iostream>
 
 class Tile
 {
@@ -10,10 +12,16 @@ class Tile
 		sf::RectangleShape m_tile;
 
 	public:
-
+		sf::VertexArray lines{ sf::Lines };
 		bool m_checked;
 		sf::Text m_text;
 		sf::Vector2i rowColumn{};
+		sf::Vector2f m_vector{};
+		sf::Vector2f getPos();
+
+		void clearLines();
+		void drawLines(sf::RenderWindow* t_window);
+
 		float m_integrationCost;
 		void setUpText(sf::Font& t_font);
 
