@@ -36,6 +36,7 @@ Grid::Grid()
 			vectorField(row, col);
 		}
 	}
+	createPath();
 }
 
 void Grid::setUpFont()
@@ -46,10 +47,24 @@ void Grid::setUpFont()
 	}
 }
 
+void Grid::createPath()
+{
+	Tile* pathTile = m_tiles.at(m_startingTile->pathPos.x).at(m_startingTile->pathPos.y);
+
+	sf::Clock m_timer;
+
+	while (pathTile->rowColumn != m_goalTile->rowColumn)
+	{
+		pathTile->setColour(sf::Color(0,255,0,125));
+		pathTile = m_tiles.at(pathTile->pathPos.x).at(pathTile->pathPos.y);
+	}
+}
+
 void Grid::update(sf::Time t_deltaTime, sf::RenderWindow& m_window)
 {
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 	{
+		newStart = true;
 		setStartTile(m_window);
 	}
 	else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
@@ -73,6 +88,13 @@ void Grid::update(sf::Time t_deltaTime, sf::RenderWindow& m_window)
 			}
 		}
 		newGoal = false;
+		createPath();
+	}
+	if(newStart)
+	{
+		setStartTile(m_window);
+		newStart = false;
+		createPath();
 	}
 
 }
@@ -162,6 +184,7 @@ void Grid::vectorField(int& t_row, int& t_col)
 			{
 				bestPath = direction;
 				bestPathCost = m_tiles.at(l_row).at(l_col)->m_integrationCost;
+				m_tiles.at(t_row).at(t_col)->pathPos = sf::Vector2i{ l_row,l_col };
 				m_tiles.at(t_row).at(t_col)->m_vector = sf::Vector2f{ t_row + (bestPath / 3) - 1.0f,t_col + (bestPath % 3) - 1.0f};
 			}
 		}
@@ -176,12 +199,13 @@ void Grid::resetGrid()
 		{
 			if (m_tiles.at(i).at(j) != m_startingTile)
 			{
-				m_tiles.at(i).at(j)->clearLines();
-				m_tiles.at(i).at(j)->m_vector = sf::Vector2f{};
-				m_tiles.at(i).at(j)->m_checked = false;
-				m_tiles.at(i).at(j)->m_cost = 0;
-				m_tiles.at(i).at(j)->m_integrationCost = 0;
+				m_tiles.at(i).at(j)->setColour(sf::Color::Black);
 			}
+			m_tiles.at(i).at(j)->clearLines();
+			m_tiles.at(i).at(j)->m_vector = sf::Vector2f{};
+			m_tiles.at(i).at(j)->m_checked = false;
+			m_tiles.at(i).at(j)->m_cost = 0;
+			m_tiles.at(i).at(j)->m_integrationCost = 0;
 		}
 	}
 }
@@ -192,9 +216,10 @@ void Grid::setStartTile(sf::RenderWindow& t_window)
 	{
 		for (int j = 0; j < 50; j++)
 		{
-			if (m_tiles.at(i).at(j)->getTile().getGlobalBounds().contains(t_window.mapPixelToCoords(sf::Mouse::getPosition(t_window))))
+			if (m_tiles.at(i).at(j) != m_goalTile)
 			{
-				if (m_tiles.at(i).at(j) != m_goalTile)
+				m_tiles.at(i).at(j)->setColour(sf::Color::Black);
+				if (m_tiles.at(i).at(j)->getTile().getGlobalBounds().contains(t_window.mapPixelToCoords(sf::Mouse::getPosition(t_window))))
 				{
 					m_startingTile->setColour(sf::Color::Black);
 					m_tiles.at(i).at(j)->setColour(sf::Color::Blue);

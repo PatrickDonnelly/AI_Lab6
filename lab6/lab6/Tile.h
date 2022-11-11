@@ -25,6 +25,7 @@ class Tile
 		float m_integrationCost;
 		void setUpText(sf::Font& t_font);
 
+		sf::Vector2i pathPos{};
 		int m_cost;
 		Tile(sf::Font& t_font);
 		float m_width = 25.0f;

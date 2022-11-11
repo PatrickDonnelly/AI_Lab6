@@ -25,6 +25,8 @@ public:
 	std::queue<Tile*> m_tileQueue{};
 	sf::Font m_textFont;
 	void setUpFont();
+	void createPath();
+	bool newStart = false;
 
 	Grid();
 	void render(sf::RenderWindow* t_window);

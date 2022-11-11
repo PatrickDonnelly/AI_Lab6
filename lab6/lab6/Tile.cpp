@@ -5,7 +5,7 @@ void Tile::setUpText(sf::Font& t_font)
 	m_text.setFont(t_font);
 	m_text.setString("0");
 	m_text.setPosition(12.5f, 12.5f);
-	m_text.setCharacterSize(16U);
+	m_text.setCharacterSize(10U);
 	m_text.setFillColor(sf::Color::White);
 }
 
@@ -47,7 +47,7 @@ void Tile::drawLines(sf::RenderWindow* t_window)
 	lines.append(sf::Vertex{ m_tile.getPosition() + sf::Vector2f{25, 25} / 2.0f, sf::Color::Magenta});
 	lines.append(sf::Vertex{ bestPathPosition + sf::Vector2f{ 25, 25 } / 2.0f, sf::Color(sf::Color(0,0,0,0))});
 	t_window->draw(lines);
-	//t_window->draw(m_text);
+	t_window->draw(m_text);
 }
 
 void Tile::setColour(sf::Color t_color)
